@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:id="@+id/text_calendar_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Calendar"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Calendar ngang  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
+        <!-- Hàng điều hướng tuần -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Nút previous -->
+            <ImageButton
+                android:id="@+id/btn_previous_week"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_nav_button"
+                android:contentDescription="Previous Week"
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/textPrimary"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <!-- Tháng và năm -->
+            <TextView
+                android:id="@+id/text_month_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="April 2025"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold" />
+
+            <!-- Nút next -->
+            <ImageButton
+                android:id="@+id/btn_next_week"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_nav_button"
+                android:contentDescription="Next Week"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/textPrimary"
+                tools:ignore="TouchTargetSizeCheck" />
+        </LinearLayout>
+
+        <!-- Horizontal Calendar RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal"
+            android:paddingBottom="4dp"
+            android:clipToPadding="false" />
+
+    </LinearLayout>
+
+
+
+
+
+    <!-- Task list RecyclerView -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:background="@color/grey"
+        android:weightSum="2">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/cs_btn_not_sellected"
+            android:text="Today"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="5dp"
+            android:text="Completed"/>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:clipToPadding="false" />
+</LinearLayout>
