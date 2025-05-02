@@ -3,6 +3,7 @@ package com.example.todoapp.ui.calendar;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +53,6 @@ public class CalendarFragment extends Fragment implements CalendarAdapter.OnDate
         calendar = Calendar.getInstance();
         dayList = new ArrayList<>();
 
-        // Set up RecyclerView
         recyclerDays.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         dayAdapter = new CalendarAdapter(getContext(), dayList, this);
         recyclerDays.setAdapter(dayAdapter);
@@ -84,7 +84,7 @@ public class CalendarFragment extends Fragment implements CalendarAdapter.OnDate
         dayList.add(new DayItem("SUN", "6", false, false));
         dayList.add(new DayItem("MON", "7", false, false));
         dayList.add(new DayItem("TUE", "8", false, true)); // Has a task
-        dayList.add(new DayItem("WED", "9", true, true));  // Selected and has a task
+        dayList.add(new DayItem("WED", "9", false, true));
         dayList.add(new DayItem("THU", "10", false, true)); // Has a task
         dayList.add(new DayItem("FRI", "11", false, false));
         dayList.add(new DayItem("SAT", "12", false, false));

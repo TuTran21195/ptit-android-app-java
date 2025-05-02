@@ -71,6 +71,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.DayVie
 //            }
 //        });
 
+        // Đặt kích thước cố định cho item để phân bổ đều 7 ngày
+        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        params.width = getScreenWidth(context) / 8; // Chia đều chiều rộng màn hình cho 7
+        holder.itemView.setLayoutParams(params);
+
         // Handle click on a day
         holder.itemView.setOnClickListener(v -> {
             // Deselect all days
@@ -101,6 +106,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.DayVie
             dot = itemView.findViewById(R.id.view_task_dot);
         }
 
+    }
+    // Hàm lấy chiều rộng màn hình
+    private int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
     }
 
 }
