@@ -1,8 +1,5 @@
 package com.example.todoapp.model;
 
-import android.media.Image;
-
-import java.lang.reflect.Constructor;
 import java.sql.Time;
 import java.util.Date;
 import java.util.List;
@@ -17,12 +14,15 @@ public class Task {
     Time dueTime;
     int priority; // từ 1 -> 10 để đánh dấu mức độ ưu tiên theo đúng thiết kế Figma
     boolean isCompleted;
-    String tag;
-    Image ic_tag;
+    String tagID; // Foreign Key : Catergory table
+
+    List<String> subTaskIds; // Foreign Key
     boolean isReminderSet;
 
 //    Constructor đủ đối
-    public Task(String id, String userId, String title, String description, Date dueDate, Time dueTime, int priority, boolean isCompleted, String tag, boolean isReminderSet) {
+
+
+    public Task(String id, String userId, String title, String description, Date dueDate, Time dueTime, int priority, boolean isCompleted, String tagID, List<String> subTaskIds, boolean isReminderSet) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -31,23 +31,9 @@ public class Task {
         this.dueTime = dueTime;
         this.priority = priority;
         this.isCompleted = isCompleted;
-        this.tag = tag;
+        this.tagID = tagID;
+        this.subTaskIds = subTaskIds;
         this.isReminderSet = isReminderSet;
-    }
-
-//    Contructor với các đối chính
-    public Task(String userId, String title, Date dueDate, Time dueTime, int priority) {
-        this.userId = userId;
-        this.title = title;
-        this.dueDate = dueDate;
-        this.dueTime = dueTime;
-        this.priority = priority;
-    }
-
-    // Contructor chỉ có title thôi
-    public Task(String userId, String title) {
-        this.userId = userId;
-        this.title = title;
     }
 
     // Getter và Setter
@@ -115,25 +101,18 @@ public class Task {
         isCompleted = completed;
     }
 
-    public String getTag() {
-        return tag;
+    public String getTagID() {
+        return tagID;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTagID(String tagID) {
+        this.tagID = tagID;
     }
 
     public boolean isReminderSet() {
         return isReminderSet;
     }
 
-    public Image getIc_tag() {
-        return ic_tag;
-    }
-
-    public void setIc_tag(Image ic_tag) {
-        this.ic_tag = ic_tag;
-    }
 
     public void setReminderSet(boolean reminderSet) {
         isReminderSet = reminderSet;

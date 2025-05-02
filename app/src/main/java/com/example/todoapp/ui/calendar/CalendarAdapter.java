@@ -1,6 +1,7 @@
 package com.example.todoapp.ui.calendar;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.DayVie
     public void onBindViewHolder(@NonNull CalendarAdapter.DayViewHolder holder, int position) {
         DayItem item = dayList.get(position);
 
+
+
+
         // Set day of week and day of month
         holder.textDay.setText(item.getDayOfWeek());
         holder.textDate.setText(item.getDayOfMonth());
@@ -50,6 +54,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.DayVie
         // Highlight selected day using the current position
         if (item.isSelected()){
             holder.itemView.setBackgroundResource(R.drawable.bg_day_selected);
+        }else{
+            holder.itemView.setBackgroundResource(R.drawable.bg_day_unselected);
         }
 //        holder.itemView.setBackgroundResource(
 //                holder.getAdapterPosition() == selectedPosition
