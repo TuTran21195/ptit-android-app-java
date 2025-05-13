@@ -2,6 +2,7 @@ package com.example.todoappv2;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -18,36 +19,46 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AddTodoActivity extends AppCompatActivity {
+public class EditTodoActivity extends AppCompatActivity {
+    public static final String EXTRA_ID = "com.example.todoappv2.EXTRA_ID";
+    public static final String EXTRA_TITLE = "com.example.todoappv2.EXTRA_TITLE";
+    public static final String EXTRA_DESCRIPTION = "com.example.todoappv2.EXTRA_DESCRIPTION";
+    public static final String EXTRA_DUE_DATE = "com.example.todoappv2.EXTRA_DUE_DATE";
+    public static final String EXTRA_PRIORITY = "com.example.todoappv2.EXTRA_PRIORITY";
+    public static final String EXTRA_COMPLETED = "com.example.todoappv2.EXTRA_COMPLETED";
+    public static final String EXTRA_HAS_REMINDER = "com.example.todoappv2.EXTRA_HAS_REMINDER";
+    public static final String EXTRA_REMINDER_TIME = "com.example.todoappv2.EXTRA_REMINDER_TIME";
+
     private TextInputEditText editTextTitle;
     private TextInputEditText editTextDescription;
     private TextInputEditText editTextDueDate;
     private TextInputEditText editTextReminderTime;
     private AutoCompleteTextView spinnerPriority;
     private AutoCompleteTextView spinnerCategories;
-
+    private ChipGroup chipGroupCategories;
     private TodoViewModel todoViewModel;
-
     private Calendar calendar;
     private Calendar reminderCalendar;
+    private SimpleDateFormat dateFormat;
+    private int todoId;
+    private List<String> categoryNames = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_todo);
+        setContentView(R.layout.activity_edit_todo);
 
         // Set up toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.add_todo);
+        getSupportActionBar().setTitle(R.string.edit_todo);
 
         // Initialize views
         editTextTitle = findViewById(R.id.edit_text_title);
@@ -56,6 +67,21 @@ public class AddTodoActivity extends AppCompatActivity {
         editTextReminderTime = findViewById(R.id.edit_text_reminder_time);
         spinnerPriority = findViewById(R.id.spinner_priority);
         spinnerCategories = findViewById(R.id.spinner_categories);
+        chipGroupCategories = findViewById(R.id.chip_group_categories);
+
+        // Initialize calendars
+        calendar = Calendar.getInstance();
+        reminderCalendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        // Get intent data
+        Intent intent = getIntent();
+        todoId = intent.getIntExtra(EXTRA_ID, -1);
+        if (todoId == -1) {
+            Toast.makeText(this, "Error: Todo not found", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         // Set up priority spinner
         ArrayAdapter<CharSequence> priorityAdapter = ArrayAdapter.createFromResource(this,
@@ -63,20 +89,19 @@ public class AddTodoActivity extends AppCompatActivity {
         priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPriority.setAdapter(priorityAdapter);
 
-        // Initialize calendar
-        calendar = Calendar.getInstance();
-        reminderCalendar = Calendar.getInstance();
-
         // Set up due date picker
         editTextDueDate.setOnClickListener(v -> showDatePicker());
 
         // Set up reminder time picker
         editTextReminderTime.setOnClickListener(v -> showReminderTimePicker());
 
+        // Initialize ViewModel
+        todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
 
         // Set up category selection
         spinnerCategories.setOnItemClickListener((parent, view, position, id) -> {
             String categoryName = parent.getItemAtPosition(position).toString();
+            addCategoryChip(categoryName, true);
             spinnerCategories.setText(""); // Clear the text after selection
         });
 
@@ -89,7 +114,7 @@ public class AddTodoActivity extends AppCompatActivity {
                 this,
                 (view, year, month, dayOfMonth) -> {
                     calendar.set(year, month, dayOfMonth);
-                    updateDueDateField();
+                    editTextDueDate.setText(dateFormat.format(calendar.getTime()));
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -98,50 +123,53 @@ public class AddTodoActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void updateDueDateField() {
-        String date = String.format("%02d/%02d/%d",
-                calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.MONTH) + 1,
-                calendar.get(Calendar.YEAR));
-        editTextDueDate.setText(date);
-    }
-
     private void showReminderTimePicker() {
         TimePickerDialog timePickerDialog = new TimePickerDialog(
-                this,
-                (view, hourOfDay, minute) -> {
-                    reminderCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    reminderCalendar.set(Calendar.MINUTE, minute);
-                    updateReminderTimeField();
-                },
-                reminderCalendar.get(Calendar.HOUR_OF_DAY),
-                reminderCalendar.get(Calendar.MINUTE),
-                true
+            this,
+            (view, hourOfDay, minute) -> {
+                reminderCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                reminderCalendar.set(Calendar.MINUTE, minute);
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                editTextReminderTime.setText(timeFormat.format(reminderCalendar.getTime()));
+            },
+            reminderCalendar.get(Calendar.HOUR_OF_DAY),
+            reminderCalendar.get(Calendar.MINUTE),
+            true
         );
         timePickerDialog.show();
     }
 
-    private void updateReminderTimeField() {
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        editTextReminderTime.setText(timeFormat.format(reminderCalendar.getTime()));
+    private void addCategoryChip(String categoryName, boolean addToList) {
+        // Check if category is already added
+        for (int i = 0; i < chipGroupCategories.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupCategories.getChildAt(i);
+            if (chip.getText().toString().equals(categoryName)) {
+                return; // Category already exists
+            }
+        }
+
+        // Create and add new chip
+        Chip chip = new Chip(this);
+        chip.setText(categoryName);
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(v -> {
+            chipGroupCategories.removeView(chip);
+
+        });
+
+
+        chipGroupCategories.addView(chip);
     }
 
     private void saveTodo() {
         String title = editTextTitle.getText().toString().trim();
         String description = editTextDescription.getText().toString().trim();
-        String dueDateStr = editTextDueDate.getText().toString().trim();
-        String reminderTimeStr = editTextReminderTime.getText().toString().trim();
         String priorityStr = spinnerPriority.getText().toString();
+        String reminderTimeStr = editTextReminderTime.getText().toString().trim();
 
         if (title.isEmpty()) {
             editTextTitle.setError("Title is required");
             editTextTitle.requestFocus();
-            return;
-        }
-
-        if (dueDateStr.isEmpty()) {
-            editTextDueDate.setError("Due date is required");
-            editTextDueDate.requestFocus();
             return;
         }
 
@@ -159,28 +187,34 @@ public class AddTodoActivity extends AppCompatActivity {
                 priority = 1; // Low
         }
 
-        // Create Todo object
+        boolean isCompleted = getIntent().getBooleanExtra(EXTRA_COMPLETED, false);
+
         Todo todo = new Todo(title, description, calendar.getTime(), priority);
+        todo.setId(todoId);
+        todo.setCompleted(isCompleted);
 
         // Set reminder if time is provided
         if (!reminderTimeStr.isEmpty()) {
             todo.setHasReminder(true);
             todo.setReminderTime(reminderCalendar.getTime());
+        } else {
+            todo.setHasReminder(false);
+            todo.setReminderTime(null);
         }
 
-        // Insert todo with categories
-        todoViewModel.insert(todo);
+        todoViewModel.update(todo);
 
 
+        Toast.makeText(this, "Todo updated", Toast.LENGTH_SHORT).show();
         finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-}
+} 
