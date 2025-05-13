@@ -1,0 +1,16 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/editTextTitle" android:hint="Title" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editTextDescription" android:hint="Description" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <AutoCompleteTextView android:id="@+id/spinnerPriority" android:hint="Priority" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editTextDueDateFrom" android:hint="Due Date From (yyyy-MM-dd)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editTextDueDateTo" android:hint="Due Date To (yyyy-MM-dd)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <CheckBox android:id="@+id/checkBoxHasReminder" android:text="Has Reminder" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editTextReminderTimeFrom" android:hint="Reminder Time From (HH:mm)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editTextReminderTimeTo" android:hint="Reminder Time To (HH:mm)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <AutoCompleteTextView android:id="@+id/spinnerCategory" android:hint="Category" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView> 

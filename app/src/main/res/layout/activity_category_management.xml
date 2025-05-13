@@ -39,4 +39,4 @@
         android:contentDescription="@string/add_category"
         app:srcCompat="@drawable/ic_add"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 
