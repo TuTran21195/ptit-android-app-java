@@ -1,16 +1,23 @@
 package com.example.todoappv2;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +30,8 @@ import com.example.todoappv2.util.NotificationHelper;
 import com.example.todoappv2.viewmodel.TodoViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,12 +46,35 @@ import android.widget.ArrayAdapter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import android.content.SharedPreferences;
+import com.bumptech.glide.Glide;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.io.ByteArrayOutputStream;
+import android.util.Base64;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private TodoViewModel todoViewModel;
     private TodoAdapter adapter;
     private List<TodoWithCategories> allTodos = new ArrayList<>();
     private int currentFilter = R.id.navigation_all;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ShapeableImageView profileImage;
+    private TextView profileName;
+    private TextView profileEmail;
+    private static final int PICK_IMAGE = 100;
+    private static final String PREF_NAME = "UserProfile";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_PROFILE_IMAGE = "profile_image";
+    private SharedPreferences sharedPreferences;
+    private Uri currentProfileImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         // Set up toolbar
-        setSupportActionBar(findViewById(R.id.toolbar));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
         // Set up FAB
@@ -130,6 +163,45 @@ public class MainActivity extends AppCompatActivity {
                 adapter.submitList(todos);
             }
         });
+
+        // Setup DrawerLayout and NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // Setup ActionBarDrawerToggle
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Setup Navigation Header
+        View headerView = navigationView.getHeaderView(0);
+        profileImage = headerView.findViewById(R.id.nav_header_image);
+        profileName = headerView.findViewById(R.id.nav_header_name);
+        profileEmail = headerView.findViewById(R.id.nav_header_email);
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        // Load saved profile data
+        loadProfileData();
+
+        // Setup profile edit button
+        headerView.findViewById(R.id.fab_edit_profile).setOnClickListener(v -> {
+            showEditProfileDialog();
+        });
+
+        // Setup profile image click
+        profileImage.setOnClickListener(v -> {
+            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            startActivityForResult(gallery, PICK_IMAGE);
+        });
+
+        // Set default selected item
+        navigationView.setCheckedItem(R.id.nav_home);
     }
 
     private void showDeleteConfirmationDialog(TodoWithCategories todoWithCategories) {
@@ -292,6 +364,130 @@ public class MainActivity extends AppCompatActivity {
             return cal.getTimeInMillis();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    private void loadProfileData() {
+        String savedUsername = sharedPreferences.getString(KEY_USERNAME, "User");
+        String savedEmail = sharedPreferences.getString(KEY_EMAIL, "user@example.com");
+        String savedImageBase64 = sharedPreferences.getString(KEY_PROFILE_IMAGE, null);
+
+        profileName.setText(savedUsername);
+        profileEmail.setText(savedEmail);
+
+        if (savedImageBase64 != null) {
+            try {
+                byte[] imageBytes = Base64.decode(savedImageBase64, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                profileImage.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                profileImage.setImageResource(R.drawable.default_profile);
+            }
+        } else {
+            profileImage.setImageResource(R.drawable.default_profile);
+        }
+    }
+
+    private void showEditProfileDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_profile, null);
+        EditText editName = dialogView.findViewById(R.id.edit_name);
+        EditText editEmail = dialogView.findViewById(R.id.edit_email);
+
+        editName.setText(profileName.getText());
+        editEmail.setText(profileEmail.getText());
+
+        new AlertDialog.Builder(this)
+            .setTitle("Edit Profile")
+            .setView(dialogView)
+            .setPositiveButton("Save", (dialog, which) -> {
+                String newName = editName.getText().toString().trim();
+                String newEmail = editEmail.getText().toString().trim();
+
+                if (!newName.isEmpty()) {
+                    profileName.setText(newName);
+                    sharedPreferences.edit().putString(KEY_USERNAME, newName).apply();
+                }
+                if (!newEmail.isEmpty()) {
+                    profileEmail.setText(newEmail);
+                    sharedPreferences.edit().putString(KEY_EMAIL, newEmail).apply();
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE && data != null) {
+            Uri selectedImage = data.getData();
+            if (selectedImage != null) {
+                try {
+                    // Load and resize image
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    bitmap = getResizedBitmap(bitmap, 512); // Resize to max 512px
+
+                    // Convert to Base64 and save
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                    String imageBase64 = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+                    
+                    // Save to SharedPreferences
+                    sharedPreferences.edit().putString(KEY_PROFILE_IMAGE, imageBase64).apply();
+                    
+                    // Update UI
+                    profileImage.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private Bitmap getResizedBitmap(Bitmap bitmap, int maxSize) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float bitmapRatio = (float) width / (float) height;
+        
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        
+        return Bitmap.createScaledBitmap(bitmap, width, height, true);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        } else if (id == R.id.nav_calendar) {
+            startActivity(new Intent(this, CalendarActivity.class));
+        } else if (id == R.id.nav_focus) {
+            startActivity(new Intent(this, FocusActivity.class));
+        } else if (id == R.id.nav_categories) {
+            startActivity(new Intent(this, CategoryManagementActivity.class));
+        } else if (id == R.id.nav_about) {
+            startActivity(new Intent(this, AboutActivity.class));
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 }

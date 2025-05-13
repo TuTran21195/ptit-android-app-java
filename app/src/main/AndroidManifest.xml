@@ -53,6 +53,10 @@
             android:name=".CalendarActivity"
             android:exported="false" />
             
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+            
         <receiver
             android:name=".receiver.ReminderReceiver"
             android:enabled="true"

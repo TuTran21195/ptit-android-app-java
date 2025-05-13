@@ -77,4 +77,18 @@
     <string name="applications">Applications</string>
     <string name="focus_complete">Focus session complete!</string>
     <string name="focus_enter_minutes">Please enter minutes</string>
+    <string name="calendar">Calendar</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_focus">Focus</string>
+    <string name="nav_categories">Categories</string>
+    <string name="nav_about">About</string>
 </resources>
