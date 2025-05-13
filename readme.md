@@ -105,3 +105,71 @@ app/
   - **Repository**: Mediates between ViewModel and data sources (Room, network, etc.)
 
 This structure ensures separation of concerns, easy feature expansion, and maintainable code.
+
+## Class & Database Design
+
+### Main Data Models
+
+- **Todo** (`todos` table)
+  - `id` (int, PK, auto-generated)
+  - `title` (String)
+  - `description` (String)
+  - `isCompleted` (boolean)
+  - `createdAt` (Date)
+  - `dueDate` (Date)
+  - `priority` (int: 1=Low, 2=Medium, 3=High)
+  - `hasReminder` (boolean)
+  - `reminderTime` (Date, nullable)
+
+- **Category** (`category_table`)
+  - `id` (int, PK, auto-generated)
+  - `name` (String)
+
+- **TodoCategoryCrossRef** (`todo_category_cross_ref`)
+  - `todoId` (int, FK → Todo.id)
+  - `categoryId` (int, FK → Category.id)
+  - Composite PK: (`todoId`, `categoryId`)
+
+- **TodoWithCategories**
+  - Represents a `Todo` with its associated `Category` list (many-to-many via `TodoCategoryCrossRef`).
+
+### Room Database Schema
+
+```
++-------------------+      +---------------------------+      +---------------------+
+|     todos         |      |  todo_category_cross_ref  |      |   category_table    |
++-------------------+      +---------------------------+      +---------------------+
+| id (PK)           |<-----| todoId (PK, FK)           |----->| id (PK)             |
+| title             |      | categoryId (PK, FK)       |      | name                |
+| description       |      +---------------------------+      +---------------------+
+| isCompleted       |
+| createdAt         |
+| dueDate           |
+| priority          |
+| hasReminder       |
+| reminderTime      |
++-------------------+
+```
+
+- **One Todo** can have multiple Categories.
+- **One Category** can be assigned to multiple Todos.
+- The cross-ref table enables this many-to-many relationship.
+
+### DAOs
+- `TodoDao`: CRUD for todos, manage cross-references, and complex queries (filtering, with categories, etc.)
+- `CategoryDao`: CRUD for categories.
+- `TodoCategoryCrossRefDao`: Manage cross-reference entries.
+
+### Example Entity Classes (simplified)
+```java
+@Entity(tableName = "todos")
+public class Todo { ... }
+
+@Entity(tableName = "category_table")
+public class Category { ... }
+
+@Entity(tableName = "todo_category_cross_ref", primaryKeys = {"todoId", "categoryId"})
+public class TodoCategoryCrossRef { ... }
+```
+
+See `/model/` and `/dao/` for full details.
