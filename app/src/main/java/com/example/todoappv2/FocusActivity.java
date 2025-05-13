@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.example.todoappv2.adapter.AppUsageAdapter;
 import com.example.todoappv2.model.AppUsage;
@@ -61,6 +63,12 @@ public class FocusActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_focus);
+
+        // Setup Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.focus_mode);
 
         timerTextView = findViewById(R.id.timerTextView);
         inputMinutes = findViewById(R.id.inputMinutes);
@@ -114,6 +122,15 @@ public class FocusActivity extends AppCompatActivity {
         });
 
         updateTimerDisplay();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void startFocusTimer() {
