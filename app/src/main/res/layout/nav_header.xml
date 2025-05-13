@@ -9,49 +9,37 @@
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/nav_header_image"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:padding="2dp"
-            android:background="@color/white"
-            android:scaleType="centerCrop"
-            android:src="@drawable/default_profile"
-            app:shapeAppearanceOverlay="@style/CircleImageView"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_edit_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="40dp"
-            android:contentDescription="Edit profile"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_edit"
-            app:tint="@color/white"
-            app:backgroundTint="@color/primary_dark"/>
-
-    </FrameLayout>
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/nav_header_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="@string/nav_header_desc"
+        android:paddingTop="8dp"
+        android:src="@drawable/default_profile"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
 
     <TextView
         android:id="@+id/nav_header_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="User Name"
+        android:paddingTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="16sp"/>
+        android:text="User" />
 
     <TextView
         android:id="@+id/nav_header_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="user@example.com"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
+        android:text="user@example.com" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_edit_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/edit_profile"
+        android:src="@drawable/ic_edit"
+        app:fabSize="mini" />
 
 </LinearLayout> 

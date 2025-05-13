@@ -57,6 +57,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.ByteArrayOutputStream;
 import android.util.Base64;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private TodoViewModel todoViewModel;
@@ -75,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_PROFILE_IMAGE = "profile_image";
     private SharedPreferences sharedPreferences;
     private Uri currentProfileImageUri;
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    private TextView navUsername, navEmail;
+    private ShapeableImageView navProfileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +211,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Set default selected item
         navigationView.setCheckedItem(R.id.nav_home);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Setup navigation header views
+        navUsername = headerView.findViewById(R.id.nav_header_name);
+        navEmail = headerView.findViewById(R.id.nav_header_email);
+        navProfileImage = headerView.findViewById(R.id.nav_header_image);
+        
+        // Make the image circular
+        navProfileImage.setShapeAppearanceModel(navProfileImage.getShapeAppearanceModel()
+            .toBuilder()
+            .setAllCornerSizes(50f)
+            .build());
+
+        // Update navigation header with user info
+        updateNavigationHeader();
     }
 
     private void showDeleteConfirmationDialog(TodoWithCategories todoWithCategories) {
@@ -461,6 +494,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return Bitmap.createScaledBitmap(bitmap, width, height, true);
     }
 
+    private void updateNavigationHeader() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // Update name
+            String displayName = currentUser.getDisplayName();
+            if (displayName != null && !displayName.isEmpty()) {
+                navUsername.setText(displayName);
+            } else {
+                navUsername.setText("User");
+            }
+
+            // Update email
+            String email = currentUser.getEmail();
+            if (email != null) {
+                navEmail.setText(email);
+            }
+
+            // Update profile image
+            if (currentUser.getPhotoUrl() != null) {
+                Glide.with(this)
+                    .load(currentUser.getPhotoUrl())
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
+                    .into(navProfileImage);
+            } else {
+                navProfileImage.setImageResource(R.drawable.default_profile);
+            }
+        }
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -476,6 +539,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(this, CategoryManagementActivity.class));
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(this, AboutActivity.class));
+        } else if (id == R.id.nav_logout) {
+            // Sign out from Firebase
+            mAuth.signOut();
+            // Sign out from Google
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+                // Navigate to login screen
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -488,6 +562,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is signed in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            // If not signed in, launch the Login Activity
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         }
     }
 }
