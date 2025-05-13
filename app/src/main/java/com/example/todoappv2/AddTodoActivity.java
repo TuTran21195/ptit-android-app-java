@@ -11,7 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.todoappv2.model.Category;
 import com.example.todoappv2.model.Todo;
+import com.example.todoappv2.util.ReminderManager;
 import com.example.todoappv2.viewmodel.TodoViewModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
@@ -32,11 +34,12 @@ public class AddTodoActivity extends AppCompatActivity {
     private TextInputEditText editTextReminderTime;
     private AutoCompleteTextView spinnerPriority;
     private AutoCompleteTextView spinnerCategories;
-
+    private ChipGroup chipGroupCategories;
     private TodoViewModel todoViewModel;
-
     private Calendar calendar;
     private Calendar reminderCalendar;
+    private List<Category> selectedCategories = new ArrayList<>();
+    private List<String> categoryNames = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class AddTodoActivity extends AppCompatActivity {
         editTextReminderTime = findViewById(R.id.edit_text_reminder_time);
         spinnerPriority = findViewById(R.id.spinner_priority);
         spinnerCategories = findViewById(R.id.spinner_categories);
+        chipGroupCategories = findViewById(R.id.chip_group_categories);
 
         // Set up priority spinner
         ArrayAdapter<CharSequence> priorityAdapter = ArrayAdapter.createFromResource(this,
@@ -73,15 +77,55 @@ public class AddTodoActivity extends AppCompatActivity {
         // Set up reminder time picker
         editTextReminderTime.setOnClickListener(v -> showReminderTimePicker());
 
+        // Initialize ViewModel
+        todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
+
+        // Observe categories
+        todoViewModel.getAllCategories().observe(this, categories -> {
+            categoryNames.clear();
+            for (Category category : categories) {
+                categoryNames.add(category.getName());
+            }
+            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, categoryNames);
+            categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerCategories.setAdapter(categoryAdapter);
+        });
 
         // Set up category selection
         spinnerCategories.setOnItemClickListener((parent, view, position, id) -> {
             String categoryName = parent.getItemAtPosition(position).toString();
+            addCategoryChip(categoryName);
             spinnerCategories.setText(""); // Clear the text after selection
         });
 
         // Set up save button
         findViewById(R.id.button_save).setOnClickListener(v -> saveTodo());
+    }
+
+    private void addCategoryChip(String categoryName) {
+        // Check if category is already added
+        for (int i = 0; i < chipGroupCategories.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroupCategories.getChildAt(i);
+            if (chip.getText().toString().equals(categoryName)) {
+                return; // Category already exists
+            }
+        }
+
+        // Create and add new chip
+        Chip chip = new Chip(this);
+        chip.setText(categoryName);
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(v -> {
+            chipGroupCategories.removeView(chip);
+            selectedCategories.removeIf(category -> category.getName().equals(categoryName));
+        });
+
+        // Add category to selected categories
+        Category category = new Category(categoryName);
+        selectedCategories.add(category);
+
+        chipGroupCategories.addView(chip);
     }
 
     private void showDatePicker() {
@@ -145,6 +189,10 @@ public class AddTodoActivity extends AppCompatActivity {
             return;
         }
 
+        if (selectedCategories.isEmpty()) {
+            Toast.makeText(this, "Please select at least one category", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Convert priority string to integer
         int priority;
@@ -169,8 +217,12 @@ public class AddTodoActivity extends AppCompatActivity {
         }
 
         // Insert todo with categories
-        todoViewModel.insert(todo);
+        todoViewModel.insert(todo, selectedCategories);
 
+        // Schedule reminder if set
+        if (todo.hasReminder()) {
+            ReminderManager.scheduleReminder(this, todo);
+        }
 
         finish();
     }

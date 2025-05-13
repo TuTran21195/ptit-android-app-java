@@ -11,11 +11,12 @@ import com.example.todoappv2.dao.CategoryDao;
 import com.example.todoappv2.dao.TodoDao;
 import com.example.todoappv2.model.Category;
 import com.example.todoappv2.model.Todo;
+import com.example.todoappv2.model.TodoCategoryCrossRef;
 import com.example.todoappv2.util.DateConverter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Todo.class, Category.class}, version = 5)
+@Database(entities = {Todo.class, Category.class, TodoCategoryCrossRef.class}, version = 5)
 @TypeConverters({DateConverter.class})
 public abstract class TodoDatabase extends RoomDatabase {
     private static TodoDatabase instance;
@@ -36,12 +37,12 @@ public abstract class TodoDatabase extends RoomDatabase {
     public static synchronized TodoDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(
-                            context.getApplicationContext(),
-                            TodoDatabase.class,
-                            "todo_database"
-                    )
-                    .addMigrations(MIGRATION_4_5)
-                    .build();
+                context.getApplicationContext(),
+                TodoDatabase.class,
+                "todo_database"
+            )
+            .addMigrations(MIGRATION_4_5)
+            .build();
         }
         return instance;
     }
