@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_all"
+        android:icon="@drawable/ic_list"
+        android:title="@string/all_todos" />
+    <item
+        android:id="@+id/navigation_active"
+        android:icon="@drawable/ic_active"
+        android:title="@string/active_todos" />
+    <item
+        android:id="@+id/navigation_completed"
+        android:icon="@drawable/ic_completed"
+        android:title="@string/completed_todos" />
+    <item
+        android:id="@+id/navigation_categories"
+        android:icon="@drawable/ic_category"
+        android:title="@string/manage_categories" />
+
+    <item
+        android:id="@+id/navigation_focus"
+        android:icon="@android:drawable/ic_lock_silent_mode_off"
+        android:title="@string/navigation_focus"/>
+</menu> 

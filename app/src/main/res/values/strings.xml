@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TodoAppV2</string>
+    <string name="add_todo">Add Todo</string>
+    <string name="edit_todo">Edit Todo</string>
+    <string name="delete_todo">Delete Todo</string>
+    <string name="delete_todo_confirmation">Are you sure you want to delete \"%1$s\"?</string>
+    <string name="delete_all">Delete All</string>
+    <string name="delete_all_confirmation">Are you sure you want to delete all todos?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="due_date">Due Date</string>
+    <string name="reminder_time">Reminder Time</string>
+    <string name="priority">Priority</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_high">High</string>
+    <string name="save">Save</string>
+    <string name="no_todos">No todos yet. Add one!</string>
+    <string name="navigation_all">All</string>
+    <string name="navigation_active">Active</string>
+    <string name="navigation_completed">Completed</string>
+    <string name="category">Category</string>
+    <string name="all">All</string>
+    <string name="active">Active</string>
+    <string name="completed">Completed</string>
+    <string name="manage_categories">Manage Categories</string>
+    <string name="add_category">Add Category</string>
+    <string name="edit_category">Edit Category</string>
+    <string name="delete_category">Delete Category</string>
+    <string name="category_name">Category Name</string>
+    <string name="category_color">Category Color</string>
+    <string name="category_name_required">Category name is required</string>
+    <string name="delete_category_confirmation">Are you sure you want to delete the category \"%1$s\"?</string>
+    <string name="categories">Categories</string>
+    <string name="no_categories">No categories available</string>
+    <string name="category_already_exists">Category already exists</string>
+    <string name="category_created">Category created</string>
+    <string name="category_updated">Category updated</string>
+    <string name="category_deleted">Category deleted</string>
+    <string name="todo_created">Todo created</string>
+    <string name="todo_updated">Todo updated</string>
+    <string name="todo_deleted">Todo deleted</string>
+    <string name="all_todos_deleted">All todos deleted</string>
+    <string name="error_required_field">This field is required</string>
+    <string name="error_invalid_date">Invalid date format</string>
+    <string name="error_invalid_priority">Invalid priority level</string>
+    <string name="error_no_categories">Please select at least one category</string>
+    <string name="all_todos">All</string>
+    <string name="active_todos">Active</string>
+    <string name="completed_todos">Completed</string>
+    <string name="navigation_focus">Focus</string>
+
+    <string-array name="priority_levels">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+
+    <string-array name="categories">
+        <item>Work</item>
+        <item>Personal</item>
+        <item>Shopping</item>
+        <item>Health</item>
+        <item>Education</item>
+        <item>Other</item>
+    </string-array>
+
+    <string name="focus_mode">Focus Mode</string>
+    <string name="start_focusing">Start Focusing</string>
+    <string name="stop_focusing">Stop Focusing</string>
+    <string name="focus_input_hint">Enter minutes</string>
+    <string name="focus_info">While your focus mode is on, all of your notifications will be off</string>
+    <string name="overview">Overview</string>
+    <string name="applications">Applications</string>
+    <string name="focus_complete">Focus session complete!</string>
+    <string name="focus_enter_minutes">Please enter minutes</string>
+</resources>
