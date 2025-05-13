@@ -173,6 +173,10 @@ public class MainActivity extends AppCompatActivity {
             showFilterDialog();
             return true;
         }
+        if (item.getItemId() == R.id.action_calendar) {
+            startActivity(new Intent(MainActivity.this, CalendarActivity.class));
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
