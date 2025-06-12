@@ -463,19 +463,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.nav_home) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        } else if (id == R.id.nav_calendar) {
-            startActivity(new Intent(this, CalendarActivity.class));
-        } else if (id == R.id.nav_focus) {
-            startActivity(new Intent(this, FocusActivity.class));
-        } else if (id == R.id.nav_categories) {
-            startActivity(new Intent(this, CategoryManagementActivity.class));
-        } else if (id == R.id.nav_about) {
-            startActivity(new Intent(this, AboutActivity.class));
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_home) {
+            // Already on home
+        } else if (itemId == R.id.nav_calendar) {
+            startActivity(new Intent(MainActivity.this, CalendarActivity.class));
+        } else if (itemId == R.id.nav_focus) {
+            startActivity(new Intent(MainActivity.this, FocusActivity.class));
+        } else if (itemId == R.id.nav_categories) {
+            startActivity(new Intent(MainActivity.this, CategoryManagementActivity.class));
+        } else if (itemId == R.id.nav_chat) {
+            startActivity(new Intent(MainActivity.this, ChatActivity.class));
+        } else if (itemId == R.id.nav_about) {
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
